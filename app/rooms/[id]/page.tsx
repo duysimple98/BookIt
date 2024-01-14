@@ -1,5 +1,4 @@
 import Error from "@/app/error";
-import Home from "@/components/Home";
 import RoomDetails from "@/components/room/RoomDetails";
 
 export const dynamic = "force-dynamic";

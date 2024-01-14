@@ -1,5 +1,6 @@
 import { IRoom } from "@/backend/models/room";
 import RoomItem from "./room/RoomItem";
+import CustomPagination from "./layout/CustomPagination";
 
 interface Props {
   data: {
@@ -29,6 +30,11 @@ const Home = ({ data }: Props) => {
           )}
         </div>
       </section>
+
+      <CustomPagination
+        resPerPage={resPerPage}
+        filteredRoomsCount={filteredRoomsCount}
+      />
     </div>
   );
 };
