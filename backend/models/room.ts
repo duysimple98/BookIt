@@ -34,7 +34,7 @@ export interface IRoom extends Document {
   isAirConditioned: boolean;
   isPetsAllowed: boolean;
   isRoomCleaning: boolean;
-  ratings: number;
+  rating: number;
   numOfReviews: number;
   images: IImage[];
   category: string;
@@ -43,7 +43,7 @@ export interface IRoom extends Document {
   createdAt: Date;
 }
 
-const roomSchema: Schema = new Schema({
+const roomSchema: Schema<IRoom> = new Schema({
   name: {
     type: String,
     required: [true, "Please enter room name"],

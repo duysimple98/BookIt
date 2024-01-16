@@ -5,13 +5,23 @@ import React, { useState } from "react";
 
 const Search = () => {
   const [location, setLocation] = useState("");
+  const [guests, setGuests] = useState("");
+  const [category, setCategory] = useState("");
 
   const router = useRouter();
 
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    router.push(`/?location=${location}`);
+    const queryString = [
+      location && `location=${encodeURIComponent(location)}`,
+      guests && `guestCapacity=${encodeURIComponent(guests)}`,
+      category && `category=${encodeURIComponent(category)}`,
+    ]
+      .filter(Boolean)
+      .join("&");
+
+    router.push(`/?${queryString}`);
   };
 
   return (
@@ -39,13 +49,17 @@ const Search = () => {
               {" "}
               No. of Guests{" "}
             </label>
-            <select className="form-select" id="guest_field">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
+            <select
+              className="form-select"
+              id="guest_field"
+              value={guests}
+              onChange={(e) => setGuests(e.target.value)}
+            >
+              {[1, 2, 3, 4, 5, 6].map((num) => (
+                <option key={num} value={num}>
+                  {num}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -54,10 +68,17 @@ const Search = () => {
               {" "}
               Room Type{" "}
             </label>
-            <select className="form-select" id="room_type_field">
-              <option value="King">King</option>
-              <option value="Single">Single</option>
-              <option value="Twins">Twins</option>
+            <select
+              className="form-select"
+              id="room_type_field"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              {["King", "Single", "Twins"].map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
             </select>
           </div>
 
