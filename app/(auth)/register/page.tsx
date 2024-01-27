@@ -1,6 +1,10 @@
 import Register from "@/components/auth/Register";
 import React from "react";
 
+export const metadata = {
+  title: "Register Account",
+};
+
 const RegisterPage = () => {
   return (
     <div>
