@@ -1,4 +1,4 @@
-import Room from "../app/backend/models/room";
+import Room from "../backend/models/room";
 import mongoose from "mongoose";
 import { rooms } from "./data";
 
