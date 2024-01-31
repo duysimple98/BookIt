@@ -1,10 +1,18 @@
 "use client";
 
 import { IRoom } from "@/backend/models/room";
+import { calculateDaysOfStay } from "@/helpers/helpers";
+import {
+  useLazyCheckBookingAvailabilityQuery,
+  useNewBookingMutation,
+} from "@/redux/api/bookingApi";
 import React, { useState } from "react";
-import DatePicker from "react-datepicker";
+import DatePicker, { registerLocale } from "react-datepicker";
+import vi from "date-fns/locale/vi";
 
 import "react-datepicker/dist/react-datepicker.css";
+
+registerLocale("vi", vi);
 
 interface Props {
   room: IRoom;
@@ -13,6 +21,13 @@ interface Props {
 const BookingDatePicker = ({ room }: Props) => {
   const [checkInDate, setCheckInDate] = useState(new Date());
   const [checkOutDate, setCheckOutDate] = useState(new Date());
+  const [daysOfStay, setDatesOfStay] = useState(0);
+
+  const [newBooking] = useNewBookingMutation();
+  const [checkBookingAvailability, { data }] =
+    useLazyCheckBookingAvailabilityQuery();
+
+  const isAvailable = data?.isAvailable;
 
   const onChange = (dates: Date[]) => {
     const [checkInDate, checkOutDate] = dates;
@@ -21,10 +36,32 @@ const BookingDatePicker = ({ room }: Props) => {
     setCheckOutDate(checkOutDate);
 
     if (checkInDate && checkOutDate) {
+      const days = calculateDaysOfStay(checkInDate, checkOutDate);
+
+      setDatesOfStay(days);
+
       // check booking availability
-      console.log("check in", checkInDate);
-      console.log("check out", checkOutDate);
+      checkBookingAvailability({
+        id: room._id,
+        checkInDate: checkInDate.toISOString(),
+        checkOutDate: checkOutDate.toISOString(),
+      });
     }
+  };
+
+  const bookRoom = () => {
+    const bookingData = {
+      room: room?._id,
+      checkInDate,
+      checkOutDate,
+      daysOfStay,
+      amountPaid: room.pricePerNight * daysOfStay,
+      paymentInfo: {
+        id: "STRIPE_ID",
+        status: "PAID",
+      },
+    };
+    newBooking(bookingData);
   };
 
   return (
@@ -36,6 +73,7 @@ const BookingDatePicker = ({ room }: Props) => {
       <p className="mt-5 mb-3">Pick Check In & Check Out Date</p>
       <DatePicker
         className="w-100"
+        locale="vi"
         selected={checkInDate}
         onChange={onChange}
         startDate={checkInDate}
@@ -44,6 +82,21 @@ const BookingDatePicker = ({ room }: Props) => {
         selectsRange
         inline
       />
+
+      {isAvailable === true && (
+        <div className="alert alert-success my-3">
+          Room is available. Book now
+        </div>
+      )}
+      {isAvailable === false && (
+        <div className="alert alert-danger my-3">
+          Room not available. Try difference dates.
+        </div>
+      )}
+
+      <button className="btn py-3 form-btn w-100" onClick={bookRoom}>
+        Pay
+      </button>
     </div>
   );
 };
