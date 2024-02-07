@@ -36,7 +36,7 @@ const RoomDetails = ({ data }: Props) => {
       // Add marker to the map
       new mapboxgl.Marker().setLngLat(coordinates).addTo(map);
     };
-    setMap();
+    if (room?.location) setMap();
   }, []);
 
   return (
