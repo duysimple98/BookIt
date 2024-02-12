@@ -51,7 +51,7 @@ const MyBookings = ({ data }: Props) => {
         id: booking._id,
         checkin: new Date(booking?.checkInDate).toLocaleString("en-US"),
         checkout: new Date(booking?.checkOutDate).toLocaleString("en-US"),
-        amountpaid: `${booking?.amountPaid}`,
+        amountpaid: `$${booking?.amountPaid}`,
         actions: (
           <div className="d-flex gap-2 justify-content-center">
             <Link href={`/bookings/${booking._id}`} className="btn btn-primary">

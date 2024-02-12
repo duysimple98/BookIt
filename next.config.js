@@ -5,6 +5,10 @@ const nextConfig = {
     DB_LOCAL_URI: "mongodb://localhost:27017/bookit-v2",
     DB_URI: "",
 
+    STRIPE_WEBHOOK_SECRET:
+      "whsec_a884e873becc12cb458a4f3b038e54b997d79c5b5f42e4a02b036642a4a7147a",
+    STRIPE_SECRET_KEY: "sk_test_YGubAgFQgURZWgUk9M1jUBHQ00dYfJSHe3",
+
     CLOUDINARY_CLOUD_NAME: "book-it",
     CLOUDINARY_API_KEY: "655584471164133",
     CLOUDINARY_API_SECRET: "xW1AD3-Rs8xsWytLnkKtYLwj93Q",
