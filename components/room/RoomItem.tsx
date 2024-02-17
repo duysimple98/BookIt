@@ -37,7 +37,7 @@ const RoomItem = ({ room }: Props) => {
           <div>
             <div className="d-flex">
               <StarRatings
-                rating={room?.ratings}
+                rating={room?.rating}
                 starRatedColor="#e61e4d"
                 numberOfStars={5}
                 starDimension="18px"
