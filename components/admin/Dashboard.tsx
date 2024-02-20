@@ -1,14 +1,39 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import SalesStats from "./SalesStats";
 import { SalesCharts } from "../charts/SalesCharts";
 import { TopPerformingChart } from "../charts/TopPerformingChart";
+import { useLazyGetSalesStatsQuery } from "@/redux/api/bookingApi";
+import toast from "react-hot-toast";
 
 const Dashboard = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+
+  const [getSalesStats, { error, data, isLoading }] =
+    useLazyGetSalesStatsQuery();
+
+  useEffect(() => {
+    if (error && "data" in error) {
+      toast.error(error?.data?.message);
+    }
+
+    if (startDate && endDate && !data) {
+      getSalesStats({
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      });
+    }
+  }, [error]);
+
+  const submitHandler = () => {
+    getSalesStats({
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+    });
+  };
 
   return (
     <div className="ps-4 my-5">
@@ -37,9 +62,11 @@ const Dashboard = () => {
           />
         </div>
 
-        <button className="btn form-btn ms-4 mt-3 px-5">Fetch</button>
+        <button className="btn form-btn ms-4 mt-3 px-5" onClick={submitHandler}>
+          Fetch
+        </button>
       </div>
-      <SalesStats />
+      <SalesStats data={data} />
       <div className="row">
         <div className="col-12 col-lg-8">
           <h4 className="my-5 text-center">Sales History</h4>
