@@ -7,6 +7,7 @@ import { SalesCharts } from "../charts/SalesCharts";
 import { TopPerformingChart } from "../charts/TopPerformingChart";
 import { useLazyGetSalesStatsQuery } from "@/redux/api/bookingApi";
 import toast from "react-hot-toast";
+import Loading from "@/app/admin/loading";
 
 const Dashboard = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -34,6 +35,8 @@ const Dashboard = () => {
       endDate: endDate.toISOString(),
     });
   };
+
+  if (!data) return <Loading />;
 
   return (
     <div className="ps-4 my-5">
@@ -75,7 +78,11 @@ const Dashboard = () => {
 
         <div className="col-12 col-lg-4 text-center">
           <h4 className="my-5">Top Performing Rooms</h4>
-          <TopPerformingChart />
+          {data?.topRooms?.length != 0 ? (
+            <TopPerformingChart rooms={data?.topRooms} />
+          ) : (
+            <p className="mt-5">No data available</p>
+          )}
         </div>
       </div>
     </div>
