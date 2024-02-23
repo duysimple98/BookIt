@@ -40,6 +40,9 @@ export const allRooms = catchAsyncErrors(async (req: NextRequest) => {
 // Create new room => /api/admin/rooms
 export const newRoom = catchAsyncErrors(async (req: NextRequest) => {
   const body = await req.json();
+
+  body.user = req.user._id;
+
   const room = await Room.create(body);
 
   return NextResponse.json({
