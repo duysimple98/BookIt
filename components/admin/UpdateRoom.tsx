@@ -58,7 +58,7 @@ const UpdateRoom = ({ data }: Props) => {
     if (isSuccess) {
       revalidateTag("RoomDetails");
       router.refresh();
-      toast.success("Room created");
+      toast.success("Room updated");
     }
   }, [error, isSuccess]);
 
