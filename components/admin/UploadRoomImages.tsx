@@ -1,7 +1,10 @@
 "use client";
 import { IImage, IRoom } from "@/backend/models/room";
 import { revalidateTag } from "@/helpers/revalidate";
-import { useUploadRoomImagesMutation } from "@/redux/api/roomApi";
+import {
+  useDeleteRoomImageMutation,
+  useUploadRoomImagesMutation,
+} from "@/redux/api/roomApi";
 import { useRouter } from "next/navigation";
 import React, { ChangeEventHandler, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -17,14 +20,27 @@ const UploadRoomImages = ({ data }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [images, setImages] = useState<string[]>([]);
   const [imagesPreview, setImagesPreview] = useState<string[]>([]);
-  const [uploadedImages, setUploadedImages] = useState<IImage[]>(
-    data?.room?.images
-  );
+  const [uploadedImages, setUploadedImages] = useState<IImage[]>([]);
+
+  useEffect(() => {
+    if (data) {
+      setUploadedImages(data?.room?.images);
+    }
+  }, [data]);
 
   const router = useRouter();
 
   const [uploadRoomImages, { error, isLoading, isSuccess }] =
     useUploadRoomImagesMutation();
+
+  const [
+    deleteRoomImage,
+    {
+      error: deleteError,
+      isLoading: isDeleteLoading,
+      isSuccess: isDeleteSuccess,
+    },
+  ] = useDeleteRoomImageMutation();
 
   useEffect(() => {
     if (error && "data" in error) {
@@ -38,6 +54,19 @@ const UploadRoomImages = ({ data }: Props) => {
       toast.success("Images Uploaded");
     }
   }, [error, isSuccess]);
+
+  useEffect(() => {
+    if (deleteError && "data" in deleteError) {
+      toast.error(deleteError?.data?.errMessage);
+    }
+
+    if (isDeleteSuccess) {
+      revalidateTag("RoomDetails");
+      setImagesPreview([]);
+      router.refresh();
+      toast.success("Image Deleted");
+    }
+  }, [deleteError, isDeleteSuccess]);
 
   const onChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const files = Array.from(e.target.files || []);
@@ -71,6 +100,10 @@ const UploadRoomImages = ({ data }: Props) => {
 
     setImagesPreview(filteredImagesPreview);
     setImages(filteredImagesPreview);
+  };
+
+  const handleImageDelete = (imgId: string) => {
+    deleteRoomImage({ id: data?.room?._id, body: { imgId } });
   };
 
   const handleResetFileInput = () => {
@@ -152,7 +185,8 @@ const UploadRoomImages = ({ data }: Props) => {
                             borderColor: "#dc3545",
                           }}
                           className="btn btn-block btn-danger cross-button mt-1 py-0"
-                          disabled
+                          onClick={() => handleImageDelete(img.public_id)}
+                          disabled={isDeleteLoading || isLoading}
                         >
                           <i className="fa fa-trash"></i>
                         </button>
