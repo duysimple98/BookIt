@@ -66,12 +66,15 @@ const AllBookings = ({ data }: Props) => {
         checkout: new Date(booking?.checkOutDate).toLocaleString("en-US"),
         actions: (
           <div className="d-flex gap-2 justify-content-center">
-            <Link href={`/bookings/${booking._id}`} className="btn btn-primary">
+            <Link
+              href={`/bookings/${booking._id}`}
+              className="btn btn-outline-primary"
+            >
               <i className="fa fa-eye"></i>
             </Link>
             <Link
               href={`/bookings/invoice/${booking._id}`}
-              className="btn btn-success"
+              className="btn btn-outline-success"
             >
               <i className="fa fa-receipt"></i>
             </Link>
