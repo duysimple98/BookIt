@@ -1,9 +1,12 @@
 "use client";
 
 import { IBooking } from "@/backend/models/booking";
+import { useDeleteBookingMutation } from "@/redux/api/bookingApi";
 import { MDBDataTable } from "mdbreact";
 import Link from "next/link";
-import React from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect } from "react";
+import toast from "react-hot-toast";
 
 interface Props {
   data: {
@@ -13,6 +16,21 @@ interface Props {
 
 const AllBookings = ({ data }: Props) => {
   const bookings = data?.bookings;
+  const router = useRouter();
+
+  const [deleteBooking, { error, isLoading, isSuccess }] =
+    useDeleteBookingMutation();
+
+  useEffect(() => {
+    if (error && "data" in error) {
+      toast.error(error?.data?.errMessage);
+    }
+
+    if (isSuccess) {
+      router.refresh();
+      toast.success("Booking deleted");
+    }
+  }, [error, isSuccess]);
 
   const setBookings = () => {
     const data: { columns: any[]; rows: any[] } = {
@@ -57,7 +75,11 @@ const AllBookings = ({ data }: Props) => {
             >
               <i className="fa fa-receipt"></i>
             </Link>
-            <button className="btn btn-outline-danger mx-2">
+            <button
+              className="btn btn-outline-danger mx-2"
+              disabled={isLoading}
+              onClick={() => deleteBookingHandler(booking?._id)}
+            >
               <i className="fa fa-trash"></i>
             </button>
           </div>
@@ -66,6 +88,10 @@ const AllBookings = ({ data }: Props) => {
     });
 
     return data;
+  };
+
+  const deleteBookingHandler = (id: string) => {
+    deleteBooking(id);
   };
 
   return (
