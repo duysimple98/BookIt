@@ -207,3 +207,25 @@ export const updateUser = catchAsyncErrors(
     });
   }
 );
+
+// Delete user => /api/admin/users/:id
+export const deleteUser = catchAsyncErrors(
+  async (req: NextRequest, { params }: { params: { id: string } }) => {
+    const user = await User.findById(params.id);
+
+    if (!user) {
+      throw new ErrorHandler("User not found with this ID", 404);
+    }
+
+    // Remove avatar from cloudinary
+    if (user?.avatar?.public_id) {
+      await delete_file(user?.avatar?.public_id);
+    }
+
+    await user.deleteOne();
+
+    return NextResponse.json({
+      success: true,
+    });
+  }
+);
