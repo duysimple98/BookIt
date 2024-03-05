@@ -182,7 +182,7 @@ export const createRoomReview = catchAsyncErrors(async (req: NextRequest) => {
   );
 
   if (isReviewed) {
-    room?.reviews?.toEach((review: IReview) => {
+    room?.reviews?.forEach((review: IReview) => {
       if (review.user?.toString() === req?.user?._id?.toString()) {
         review.comment = comment;
         review.rating = rating;
@@ -225,5 +225,46 @@ export const allAdminRooms = catchAsyncErrors(async (req: NextRequest) => {
   const rooms = await Room.find();
   return NextResponse.json({
     rooms,
+  });
+});
+
+// Get room reviews - ADMIN => /api/admin/rooms/reviews
+export const getRoomReviews = catchAsyncErrors(async (req: NextRequest) => {
+  const { searchParams } = new URL(req.url);
+
+  const room = await Room.findById(searchParams.get("roomId"));
+
+  return NextResponse.json({
+    reviews: room.reviews,
+  });
+});
+
+// Delete room review - ADMIN => /api/admin/rooms/reviews
+export const deleteRoomReview = catchAsyncErrors(async (req: NextRequest) => {
+  const { searchParams } = new URL(req.url);
+
+  const roomId = searchParams.get("roomId");
+  const reviewId = searchParams.get("id");
+
+  const room = await Room.findById(roomId);
+
+  const reviews = room.reviews.filter(
+    (review: IReview) => review?._id.toString() !== reviewId
+  );
+
+  const numOfReviews = reviews.length;
+
+  const rating =
+    numOfReviews === 0
+      ? 0
+      : room?.reviews?.reduce(
+          (acc: number, item: { rating: number }) => item.rating + acc,
+          0
+        ) / room?.reviews?.length;
+
+  await Room.findByIdAndUpdate(roomId, { reviews, numOfReviews, rating });
+
+  return NextResponse.json({
+    success: true,
   });
 });
